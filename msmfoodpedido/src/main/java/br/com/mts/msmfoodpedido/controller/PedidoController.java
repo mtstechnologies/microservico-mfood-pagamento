@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,6 +20,7 @@ import br.com.mts.msmfoodpedido.dto.StatusDto;
 import br.com.mts.msmfoodpedido.service.PedidoService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+
 
 @RestController
 @RequestMapping("/pedidos")
@@ -39,6 +41,11 @@ public class PedidoController {
 
             return  ResponseEntity.ok(dto);
         }
+        
+        @GetMapping("/porta")
+        public String retornaPorta(@Value("${local.server.port}") String porta){
+            return String.format("Requisição respondida pela instância executando na porta %s", porta);
+        } 
 
         @PostMapping()
         public ResponseEntity<PedidoDto> realizaPedido(@RequestBody @Valid PedidoDto dto, UriComponentsBuilder uriBuilder) {
