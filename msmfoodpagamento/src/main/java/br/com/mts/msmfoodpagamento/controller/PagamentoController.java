@@ -20,6 +20,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import br.com.mts.msmfoodpagamento.dto.PagamentoDto;
 import br.com.mts.msmfoodpagamento.service.PagamentoService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
@@ -64,7 +65,7 @@ public class PagamentoController {
     }
     
     @PatchMapping("/{id}/confirmar")
-    //@CircuitBreaker(name = "atualizaPedido", fallbackMethod = "pagamentoAutorizadoComIntegracaoPendente")
+    @CircuitBreaker(name = "atualizaPedido", fallbackMethod = "")
     public void confirmarPagamento(@PathVariable @NotNull Long id){
         service.confirmarPagamento(id);
     }
