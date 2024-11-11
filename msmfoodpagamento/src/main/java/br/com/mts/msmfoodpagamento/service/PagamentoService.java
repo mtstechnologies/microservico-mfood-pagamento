@@ -1,5 +1,7 @@
 package br.com.mts.msmfoodpagamento.service;
 
+import java.util.Optional;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -7,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import br.com.mts.msmfoodpagamento.dto.PagamentoDto;
+import br.com.mts.msmfoodpagamento.httpfeign.PedidoClient;
 import br.com.mts.msmfoodpagamento.model.Pagamento;
 import br.com.mts.msmfoodpagamento.model.Status;
 import br.com.mts.msmfoodpagamento.repository.PagamentoRepository;
@@ -20,6 +23,9 @@ public class PagamentoService {
 
     @Autowired
     private ModelMapper modelMapper;
+    
+    @Autowired
+    PedidoClient pedido;
 
 
     public Page<PagamentoDto> obterTodos(Pageable paginacao) {
@@ -52,6 +58,18 @@ public class PagamentoService {
 
     public void excluirPagamento(Long id) {
         repository.deleteById(id);
+    }
+    
+    public void confirmarPagamento(Long id){
+        Optional<Pagamento> pagamento = repository.findById(id);
+
+        if (!pagamento.isPresent()) {
+            throw new EntityNotFoundException();
+        }
+
+        pagamento.get().setStatus(Status.CONFIRMADO);
+        repository.save(pagamento.get());
+        pedido.atualizaPagamento(pagamento.get().getPedidoId());
     }
 
 }
