@@ -10,7 +10,7 @@ public class PagamentoListener {
 
 	//classe consumidora de mensagem
 	
-	@RabbitListener(queues = "pagamento.concluido")
+	@RabbitListener(queues = "pagamentos.detalhes-pedido")
 	public void recebeMensagem(PagamentoDto pagamento) {
 		//text bloc surgiu a partir da versao 15 do java, usado para formatar uma mensagem
 		String mensagem = """
