@@ -10,7 +10,15 @@ import br.com.mts.msmfoodavaliacao.dto.PagamentoDto;
 public class AvaliacaoListener {
     @RabbitListener(queues = "pagamentos.detalhes-avaliacao")
     public void recebeMensagem(@Payload PagamentoDto pagamento) {
-        String mensagem = """
+        
+    	System.out.println(pagamento.getId());
+    	System.out.println(pagamento.getNumero());
+    	
+    	if(pagamento.getNumero().equals("0000")) {
+    		throw new RuntimeException("não consegui processar");
+    	}
+    	
+    	String mensagem = """
                 Necessário criar registro de avaliação para o pedido: %s 
                 Id do pagamento: %s
                 Nome do cliente: %s

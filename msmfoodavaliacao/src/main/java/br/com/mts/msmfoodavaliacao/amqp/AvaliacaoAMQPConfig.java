@@ -34,22 +34,45 @@ public class AvaliacaoAMQPConfig {
     public Queue filaDetalhesAvaliacao() {
         return QueueBuilder
                 .nonDurable("pagamentos.detalhes-avaliacao")
+                .deadLetterExchange("pagamentos.dlx")//caso apresente erro encaminha para a fila de mensagens mortas
                 .build();
     }
-
+    
     @Bean
     public FanoutExchange fanoutExchange() {
         return ExchangeBuilder
                 .fanoutExchange("pagamentos.ex")
                 .build();
     }
-
+    
     @Bean
-    public Binding bindPagamentoPedido(FanoutExchange fanoutExchange) {
+    public Binding bindPagamentoPedido() {
         return BindingBuilder
                 .bind(filaDetalhesAvaliacao())
                 .to(fanoutExchange());
     }
+    
+  //nesta fila irei tratar das filas mortas, redirecionando-as
+    @Bean
+    public Queue filaDlqDetalhesAvaliacao() {
+        return QueueBuilder
+                .nonDurable("pagamentos.detalhes-avaliacao-dlq")
+                .build();
+    }
+    //nesta exchange irei tratar das filas mortas, redirecionando-as
+    @Bean
+    public FanoutExchange deadLetterExchange() {
+        return ExchangeBuilder
+                .fanoutExchange("pagamentos.dlx")
+                .build();
+    }
+    //unindo exchange com a fila tratar das filas mortas
+    @Bean
+    public Binding bindDlxPagamentoPedido() {
+        return BindingBuilder
+                .bind(filaDlqDetalhesAvaliacao())
+                .to(deadLetterExchange());
+    } 
 
     @Bean
     public RabbitAdmin criaRabbitAdmin(ConnectionFactory conn) {
